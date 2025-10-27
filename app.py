@@ -1,102 +1,81 @@
-# app.py
-import streamlit as st
-import pandas as pd
 import os
-import random
+import pandas as pd
+import streamlit as st
 
-# ----------------------------
-# SETUP
-# ----------------------------
-st.set_page_config(page_title="WizardVerse AI: House Quiz", page_icon="🧙‍♂️", layout="wide")
+# 🎩 Basic page setup
+st.set_page_config(
+    page_title="WizardVerse AI 🧙‍♂️",
+    page_icon="🪄",
+    layout="wide"
+)
 
-BASE_DIR = os.path.dirname(__file__)  # automatically detects current folder
-
-# Load CSVs safely
-@st.cache_data
-def load_data():
-    dialogues = pd.read_csv(os.path.join(BASE_DIR, "movies", "Dialogue.csv"), encoding="latin-1")
-    spells = pd.read_csv(os.path.join(BASE_DIR, "movies", "Spells.csv"), encoding="latin-1")
-    return dialogues, spells
-
-dialogues, spells = load_data()
-
-# ----------------------------
-# HOUSE THEMES
-# ----------------------------
-house_themes = {
-    "Gryffindor": {"color": "#740001", "bg": "https://i.imgur.com/Ns6h2CJ.jpg"},
-    "Slytherin": {"color": "#1A472A", "bg": "https://i.imgur.com/dgZsfxL.jpg"},
-    "Ravenclaw": {"color": "#222F5B", "bg": "https://i.imgur.com/wWVuJZX.jpg"},
-    "Hufflepuff": {"color": "#EEE117", "bg": "https://i.imgur.com/G0b6v3B.jpg"},
-}
-
-# ----------------------------
-# MAIN PAGE
-# ----------------------------
-st.title("🏰 Welcome to WizardVerse AI: The House Challenge")
-house = st.selectbox("Choose your Hogwarts House:", list(house_themes.keys()))
-theme = house_themes[house]
-
-# Background
+# ✨ Hogwarts header
 st.markdown(
-    f"""
-    <style>
-        body {{
-            background-color: {theme['color']};
-            background-image: url({theme['bg']});
-            background-size: cover;
-        }}
-    </style>
+    """
+    <div style="text-align:center; font-family: 'Garamond'; font-size:40px; color:#d4af37;">
+        <b>⚡ WizardVerse AI ⚡</b><br>
+        <span style="font-size:20px; color:#e6e6fa;">
+        Explore the magic of Harry Potter — books, movies & fandom!
+        </span>
+    </div>
     """,
     unsafe_allow_html=True
 )
 
-st.markdown(f"### 🪄 Welcome, {house} Wizard! Your magical challenge begins now...")
+# 🗂️ Define base directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ----------------------------
-# HOUSE QUIZZES
-# ----------------------------
-if house == "Gryffindor":
-    st.header("🦁 Battle of Wits")
-    row = dialogues.sample(1).iloc[0]
-    quote = row['dialogue']
-    ans = row['character']
-    guess = st.text_input(f"Who said this quote? 💬 '{quote}'")
-    if st.button("Check Answer"):
-        if guess.lower().strip() == str(ans).lower().strip():
-            st.success("✨ Correct! You’re a true Gryffindor hero!")
-        else:
-            st.error(f"Incorrect! It was {ans}.")
+# 🧠 Safe data loader
+@st.cache_data
+def load_data():
+    try:
+        dialogues_path = os.path.join(BASE_DIR, "movies", "Dialogue.csv")
+        spells_path = os.path.join(BASE_DIR, "movies", "Spells.csv")
 
-elif house == "Slytherin":
-    st.header("🐍 Riddle of the Serpent")
-    riddle = "I can make you invisible, but I’m not a spell. I’m a thing you wear, but not on your feet. What am I?"
-    answer = "cloak"
-    guess = st.text_input("Decode the Riddle:")
-    if st.button("Reveal"):
-        if "cloak" in guess.lower():
-            st.success("Clever as always — Invisibility Cloak!")
-        else:
-            st.error("Think deeper, Slytherin. The answer was: *Invisibility Cloak*.")
+        # 🧾 Read CSVs
+        dialogues = pd.read_csv(dialogues_path, encoding="latin-1")
+        spells = pd.read_csv(spells_path, encoding="latin-1")
 
-elif house == "Ravenclaw":
-    st.header("🦅 Raven’s Riddle")
-    st.write("What magical object shows your deepest desire?")
-    guess = st.text_input("Your Answer:")
-    if st.button("Submit"):
-        if "mirror of erised" in guess.lower():
-            st.success("Brilliant! The *Mirror of Erised* — wisdom shines within you 🦅")
-        else:
-            st.error("Incorrect — the answer was *Mirror of Erised*.")
+        return dialogues, spells
 
-elif house == "Hufflepuff":
-    st.header("🦡 Magical Memory Match")
-    row = spells.sample(1).iloc[0]
-    effect = row['effect']
-    spell = row['spell']
-    guess = st.text_input(f"What spell causes this effect? '{effect}'")
-    if st.button("Reveal Spell"):
-        if guess.lower().strip() == str(spell).lower().strip():
-            st.success(f"Well done! It’s {spell}. True Hufflepuff spirit 💛")
-        else:
-            st.error(f"Almost! The correct spell was {spell}.")
+    except FileNotFoundError as e:
+        st.error("🪶 Oops! A magical scroll (CSV) has gone missing in Hogwarts’ archives.")
+        st.info("Make sure your `movies/` folder and CSV files are uploaded to GitHub or present locally.")
+        st.code(str(e))
+        return None, None
+
+
+# 🧙 Load data
+dialogues, spells = load_data()
+
+# ✅ Continue only if data loaded
+if dialogues is not None and spells is not None:
+    st.success("✅ Magical datasets loaded successfully!")
+
+    # Show preview
+    with st.expander("📜 View a glimpse of the Wizarding dialogues"):
+        st.dataframe(dialogues.head(10))
+
+    with st.expander("✨ View spells and charms"):
+        st.dataframe(spells.head(10))
+
+    st.markdown("---")
+    st.markdown(
+        "<h3 style='color:#ffd700;'>🏰 Ready to enter the House Quiz Chamber?</h3>",
+        unsafe_allow_html=True
+    )
+
+    # 🧩 House Selection Quiz Placeholder
+    house = st.radio(
+        "Choose your House to start your magical journey:",
+        ["Gryffindor 🦁", "Slytherin 🐍", "Ravenclaw 🦅", "Hufflepuff 🦡"]
+    )
+
+    st.markdown(
+        f"<div style='font-size:20px; color:#e6e6fa;'>Welcome to the {house} challenge! ⚔️</div>",
+        unsafe_allow_html=True
+    )
+
+    st.write("🧩 The quiz & puzzle section will appear here soon...")
+else:
+    st.warning("🧹 Waiting for the datasets to be restored before continuing the adventure.")
