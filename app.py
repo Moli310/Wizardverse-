@@ -38,46 +38,46 @@ def home():
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        if st.button("🦁 Gryffindor"):
+        if st.button(" Gryffindor"):
             st.session_state["page"] = "Gryffindor"
 
     with col2:
-        if st.button("🦡 Hufflepuff"):
+        if st.button(" Hufflepuff"):
             st.session_state["page"] = "Hufflepuff"
 
     with col3:
-        if st.button("🦅 Ravenclaw"):
+        if st.button(" Ravenclaw"):
             st.session_state["page"] = "Ravenclaw"
 
     with col4:
-        if st.button("🐍 Slytherin"):
+        if st.button(" Slytherin"):
             st.session_state["page"] = "Slytherin"
 
 # ---- House Pages ----
 def gryffindor_page():
     set_background("assets/gryffindor_bg.jpg")
-    st.title("🦁 Gryffindor House")
+    st.title("Gryffindor House")
     st.write("Bravery, daring, nerve, and chivalry define a Gryffindor!")
     st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
     st.write("🚧 Coming soon... magical features await!")
 
 def hufflepuff_page():
     set_background("assets/hufflepuff_bg.jpg")
-    st.title("🦡 Hufflepuff House")
+    st.title("Hufflepuff House")
     st.write("Loyalty, patience, and hard work make you shine!")
     st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
     st.write("🚧 Coming soon... magical features await!")
 
 def ravenclaw_page():
     set_background("assets/ravenclaw_bg.jpg")
-    st.title("🦅 Ravenclaw House")
+    st.title("Ravenclaw House")
     st.write("Wit, wisdom, and learning light your way.")
     st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
     st.write("🚧 Coming soon... magical features await!")
 
 def slytherin_page():
     set_background("assets/serpent_bg.jpg")
-    st.title("🐍 Slytherin House")
+    st.title("Slytherin House")
     st.write("Ambition, cunning, and resourcefulness guide you.")
     st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
     st.write("🚧 Coming soon... magical features await!")
