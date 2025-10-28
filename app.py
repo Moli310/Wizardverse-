@@ -1,137 +1,94 @@
 import streamlit as st
-import base64
 from pathlib import Path
+import base64
+import pandas as pd
 
 # ---- Page Config ----
 st.set_page_config(page_title="WizardVerse AI", layout="wide")
 
-# ---- Helper: Background with overlay and smaller image scaling ----
-def set_background(image_path: str):
-    """Encodes and sets a local image as Streamlit background with subtle dark overlay."""
+# ---- Helper Functions ----
+def set_background(image_path):
     file_path = Path(image_path)
     if not file_path.exists():
-        st.warning(f"⚠️ Background image not found: {file_path}")
+        st.warning(f"⚠ Image {image_path} not found!")
         return
-
     with open(file_path, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
-
     st.markdown(
         f"""
         <style>
         .stApp {{
-            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-                              url("data:image/jpeg;base64,{encoded}");
-            background-size: contain;  /* 👈 makes image smaller */
+            background-image: url("data:image/jpeg;base64,{encoded}");
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
+            filter: brightness(0.8);
         }}
         </style>
-        """,
-        unsafe_allow_html=True
+        """, unsafe_allow_html=True
     )
 
-# ---- Home Page ----
-def home():
-    st.title("⚡ WizardVerse AI ⚡")
-    st.subheader("Explore the magic of Harry Potter — choose your House to begin your adventure!")
+def front_page():
+    set_background("assets/hogwarts.jpg")
+    st.markdown("<h1 style='text-align:center;color:white;'>🏰 Welcome to WizardVerse AI 🪄</h1>", unsafe_allow_html=True)
 
-    # Show front image (your uploaded one)
-    front_img = "assets/Hogwarts"  # rename the uploaded image to this
-    if Path(front_img).exists():
-        st.image(front_img, use_container_width=True)
-
-    st.write("---")
+    # House selection with images
     col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        if st.button("🦁 Gryffindor"):
-            st.session_state["page"] = "Gryffindor"
-    with col2:
-        if st.button("🦡 Hufflepuff"):
-            st.session_state["page"] = "Hufflepuff"
-    with col3:
-        if st.button("🦅 Ravenclaw"):
-            st.session_state["page"] = "Ravenclaw"
-    with col4:
-        if st.button("🐍 Slytherin"):
-            st.session_state["page"] = "Slytherin"
+    houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
+    for col, house in zip([col1, col2, col3, col4], houses):
+        with col:
+            if st.button(f"{house}"):
+                st.session_state['house'] = house
+            st.image(f"assets/{house.lower()}.png", use_column_width=True)
 
-# ---- House Pages ----
-def gryffindor_page():
-    set_background("assets/gryffindor_bg.jpg")
-    st.title("🦁 Gryffindor House")
-    st.write("Bravery, daring, nerve, and chivalry define a Gryffindor!")
-    st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
+def house_page(house):
+    set_background(f"assets/{house.lower()}.jpg")
+    st.markdown(f"<h1 style='text-align:center;color:white;'>{house} House 🏰</h1>", unsafe_allow_html=True)
 
-    if st.button("✨ Enter Quiz"):
-        st.session_state["page"] = "Quiz"
+    # Navigation
+    if st.button("⬅ Back to Hogwarts"):
+        st.session_state['house'] = None
 
-    st.write("🚧 Coming soon... magical features await!")
-    if st.button("⬅️ Back to Houses"):
-        st.session_state["page"] = "Home"
+    # --- Dataset-driven Quizzes ---
+    st.subheader("📝 Quizzes")
+    quiz_df = pd.read_csv(f"datasets/{house.lower()}_quiz.csv")  # Example CSV: columns = question, option1..4, answer
+    for idx, row in quiz_df.iterrows():
+        st.write(f"**Q{idx+1}: {row['question']}**")
+        options = [row['option1'], row['option2'], row['option3'], row['option4']]
+        ans = st.radio(f"Select answer for Q{idx+1}", options, key=f"quiz{idx}")
+        if st.button(f"Submit Q{idx+1}", key=f"submit{idx}"):
+            if ans == row['answer']:
+                st.success("✅ Correct!")
+            else:
+                st.error(f"❌ Wrong! Correct answer: {row['answer']}")
 
-def hufflepuff_page():
-    set_background("assets/hufflepuff_bg.jpg")
-    st.title("🦡 Hufflepuff House")
-    st.write("Loyalty, patience, and hard work make you shine!")
-    st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
+    # --- Dataset-driven Puzzles ---
+    st.subheader("🧩 Puzzles")
+    puzzle_df = pd.read_csv(f"datasets/{house.lower()}_puzzles.csv")  # Example: columns = puzzle, answer
+    for idx, row in puzzle_df.iterrows():
+        st.write(f"Puzzle {idx+1}: {row['puzzle']}")
+        user_ans = st.text_input("Your Answer", key=f"puzzle{idx}")
+        if st.button(f"Check Puzzle {idx+1}", key=f"check{idx}"):
+            if user_ans.strip().lower() == row['answer'].lower():
+                st.success("🎉 Correct!")
+            else:
+                st.error(f"❌ Try Again! Answer: {row['answer']}")
 
-    if st.button("✨ Enter Quiz"):
-        st.session_state["page"] = "Quiz"
+    # --- Spells ---
+    st.subheader("🪄 Spells")
+    spells_df = pd.read_csv("datasets/spells.csv")  # columns = spell, effect
+    spell_choice = st.selectbox("Choose a spell", spells_df['spell'])
+    if st.button("Cast Spell"):
+        effect = spells_df[spells_df['spell'] == spell_choice]['effect'].values[0]
+        st.info(f"{spell_choice} spell casted! ✨ Effect: {effect}")
 
-    st.write("🚧 Coming soon... magical features await!")
-    if st.button("⬅️ Back to Houses"):
-        st.session_state["page"] = "Home"
+# ---- Main App Logic ----
+if 'house' not in st.session_state:
+    st.session_state['house'] = None
 
-def ravenclaw_page():
-    set_background("assets/ravenclaw_bg.jpg")
-    st.title("🦅 Ravenclaw House")
-    st.write("Wit, wisdom, and learning light your way.")
-    st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
-
-    if st.button("✨ Enter Quiz"):
-        st.session_state["page"] = "Quiz"
-
-    st.write("🚧 Coming soon... magical features await!")
-    if st.button("⬅️ Back to Houses"):
-        st.session_state["page"] = "Home"
-
-def slytherin_page():
-    set_background("assets/serpent_bg.jpg")
-    st.title("🐍 Slytherin House")
-    st.write("Ambition, cunning, and resourcefulness guide you.")
-    st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
-
-    if st.button("✨ Enter Quiz"):
-        st.session_state["page"] = "Quiz"
-
-    st.write("🚧 Coming soon... magical features await!")
-    if st.button("⬅️ Back to Houses"):
-        st.session_state["page"] = "Home"
-
-# ---- Quiz Placeholder ----
-def quiz_page():
-    st.title("🪄 Wizarding Quiz Chamber")
-    st.write("Answer a few questions to test your magical knowledge!")
-    st.markdown("🚧 *Quiz content coming soon...*")
-
-    if st.button("⬅️ Back to House"):
-        st.session_state["page"] = "Home"
-
-# ---- Page Routing ----
-if "page" not in st.session_state:
-    st.session_state["page"] = "Home"
-
-pages = {
-    "Home": home,
-    "Gryffindor": gryffindor_page,
-    "Hufflepuff": hufflepuff_page,
-    "Ravenclaw": ravenclaw_page,
-    "Slytherin": slytherin_page,
-    "Quiz": quiz_page,
-}
-
-pages[st.session_state["page"]]()
+if st.session_state['house'] is None:
+    front_page()
+else:
+    house_page(st.session_state['house'])
 
 
