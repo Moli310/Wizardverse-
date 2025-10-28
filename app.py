@@ -1,105 +1,69 @@
-import os
-import pandas as pd
 import streamlit as st
 
-# 🎩 Basic page setup
-st.set_page_config(
-    page_title="WizardVerse AI 🧙‍♂️",
-    page_icon="🪄",
-    layout="wide"
-)
+st.set_page_config(page_title="WizardVerse: Hogwarts Adventure", layout="centered")
 
-# ✨ Hogwarts header
-st.markdown(
-    """
-    <div style="text-align:center; font-family: 'Garamond'; font-size:40px; color:#d4af37;">
-        <b>⚡ WizardVerse AI ⚡</b><br>
-        <span style="font-size:20px; color:#e6e6fa;">
-        Explore the magic of Harry Potter — books, movies & fandom!
-        </span>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.title("🏰 Welcome to Hogwarts!")
+st.markdown("Choose your house to begin your magical journey ⚡")
 
-# 🗂️ Define base directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MOVIES_DIR = os.path.join(BASE_DIR, "movies")
-ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+# Initialize session state
+if 'house' not in st.session_state:
+    st.session_state['house'] = None
 
-# 🧠 Safe CSV loader
-@st.cache_data
-def safe_load_csv(filename):
-    filepath = os.path.join(MOVIES_DIR, filename)
-    if not os.path.exists(filepath):
-        st.error(f"🪶 Missing file: {filename} — please check if it's uploaded to the `movies/` folder.")
-        return None
-    return pd.read_csv(filepath, encoding="latin-1")
+houses = {
+    "🦁 Gryffindor": "Bravery, courage, and chivalry.",
+    "🐍 Slytherin": "Cunning, ambition, and resourcefulness.",
+    "🦅 Ravenclaw": "Wisdom, wit, and learning.",
+    "🦡 Hufflepuff": "Loyalty, patience, and dedication."
+}
 
-# 🧙 Load all datasets
-with st.spinner("Summoning Hogwarts datasets... 🧙‍♀️"):
-    dialogues = safe_load_csv("Dialogue.csv")
-    spells = safe_load_csv("Spells.csv")
-    characters = safe_load_csv("Characters.csv")
-    places = safe_load_csv("Places.csv")
-    movies = safe_load_csv("Movies.csv")
-    chapters = safe_load_csv("Chapters.csv")
+# ---- HOME PAGE ----
+if st.session_state['house'] is None:
+    st.subheader("✨ Select your Hogwarts House ✨")
 
-# ✅ Continue only if data loaded
-if dialogues is not None and spells is not None:
-    st.success("✅ Magical datasets loaded successfully!")
+    col1, col2 = st.columns(2)
+    for i, (house, desc) in enumerate(houses.items()):
+        col = col1 if i % 2 == 0 else col2
+        if col.button(house):
+            st.session_state['house'] = house
 
-    # 🧾 Show previews
-    with st.expander("📜 View Wizarding Dialogues"):
-        st.dataframe(dialogues.head(10))
-
-    with st.expander("✨ View Spells and Charms"):
-        st.dataframe(spells.head(10))
-
-    st.markdown("---")
-    st.markdown(
-        "<h3 style='color:#ffd700;'>🏰 Ready to enter the House Quiz Chamber?</h3>",
-        unsafe_allow_html=True
-    )
-
-    # 🧩 House Selection Quiz
-    house = st.radio(
-        "Choose your House to start your magical journey:",
-        ["Gryffindor 🦁", "Slytherin 🐍", "Ravenclaw 🦅", "Hufflepuff 🦡"]
-    )
-
-    # 🖼️ Change background based on selection
-    if "Gryffindor" in house:
-        bg_path = os.path.join(ASSETS_DIR, "gryffindor_bg.jpg")
-    elif "Slytherin" in house:
-        bg_path = os.path.join(ASSETS_DIR, "serpent_bg.jpg")
-    elif "Ravenclaw" in house:
-        bg_path = os.path.join(ASSETS_DIR, "ravenclaw_bg.jpg")
-    else:
-        bg_path = os.path.join(ASSETS_DIR, "hufflepuff_bg.jpg")
-
-    if os.path.exists(bg_path):
-        st.markdown(
-            f"""
-            <style>
-                .stApp {{
-                    background-image: url("file://{bg_path}");
-                    background-size: cover;
-                    background-position: center;
-                    background-attachment: fixed;
-                }}
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-
-    st.markdown(
-        f"<div style='font-size:20px; color:#e6e6fa;'>Welcome to the {house} challenge! ⚔️</div>",
-        unsafe_allow_html=True
-    )
-
-    # 🧩 Placeholder for quiz/puzzles
-    st.info("🧩 The quiz & puzzle section will appear here soon... Stay tuned for magical riddles and challenges!")
+# ---- HOUSE PAGE ----
 else:
-    st.warning("🧹 Waiting for the datasets to be restored before continuing the adventure.")
-    st.info("Make sure your `movies/` folder and CSV files are uploaded to GitHub or present locally.")
+    house = st.session_state['house']
+    st.success(f"You are now in {house}!")
+    st.button("🏠 Go Back to Houses", on_click=lambda: st.session_state.update({'house': None}))
+
+    tab1, tab2, tab3 = st.tabs(["🧠 Quiz", "🧩 Puzzle", "✨ Spells"])
+
+    with tab1:
+        st.header("House Quiz")
+        q1 = st.radio("1️⃣ What spell is used to disarm an opponent?",
+                      ["Expelliarmus", "Avada Kedavra", "Lumos"])
+        q2 = st.radio("2️⃣ What platform do students use to board the Hogwarts Express?",
+                      ["9¾", "7½", "10½"])
+        if st.button("Submit Quiz"):
+            score = 0
+            if q1 == "Expelliarmus":
+                score += 1
+            if q2 == "9¾":
+                score += 1
+            st.success(f"Your score: {score}/2")
+
+    with tab2:
+        st.header("House Puzzle 🧩")
+        st.write("Riddle: What has to be broken before you can use it?")
+        answer = st.text_input("Your answer:")
+        if st.button("Check Answer"):
+            if answer.lower().strip() == "egg":
+                st.success("Correct! 🥚")
+            else:
+                st.error("Try again!")
+
+    with tab3:
+        st.header("✨ Spell Book")
+        st.write("- **Alohomora** – Unlocks doors.")
+        st.write("- **Wingardium Leviosa** – Makes things levitate.")
+        st.write("- **Expecto Patronum** – Summons a Patronus.")
+        st.write("- **Lumos** – Lights up your wand tip.")
+
+st.markdown("---")
+st.caption("Made with 🪄 magic and Streamlit.")
