@@ -1,15 +1,26 @@
 import streamlit as st
+import base64
+from pathlib import Path
 
 # ---- Page Config ----
 st.set_page_config(page_title="WizardVerse AI", layout="wide")
 
 # ---- Helper function to set background ----
-def set_background(image_file):
+def set_background(image_path: str):
+    """Encodes and sets a local image as Streamlit background."""
+    file_path = Path(image_path)
+    if not file_path.exists():
+        st.warning(f"⚠️ Background image not found: {file_path}")
+        return
+
+    with open(file_path, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+
     st.markdown(
         f"""
         <style>
         .stApp {{
-            background-image: url("file://{image_file}");
+            background-image: url("data:image/jpeg;base64,{encoded}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -86,8 +97,9 @@ elif st.session_state["page"] == "Ravenclaw":
 elif st.session_state["page"] == "Slytherin":
     slytherin_page()
 
-# ---- Back button for house pages ----
+# ---- Back button ----
 if st.session_state["page"] != "Home":
     if st.button("⬅️ Back to Houses"):
         st.session_state["page"] = "Home"
+
 
