@@ -120,6 +120,72 @@ puzzles = {
         {"p": "Unscramble: ROWENA", "a": "Rowena"},
         {"p": "Unscramble: EAGLE", "a": "Eagle"},
         {"p": "Unscramble: RAVNCLAW", "a": "Ravenclaw"},
-        {"p": "Unscramble: YSIDOMW
+        {"p": "Unscramble: YSIDOMW , "a": "Wisdom"},
+        {"p": "Unscramble: LNAUERIG", "a": "Learning"},
+        {"p": "Unscramble: LUNA LOVEGOOD", "a": "Luna Lovegood"},
+        {"p": "Unscramble: TOWER", "a": "Tower"},
+        {"p": "Unscramble: NIBRAE", "a": "Brain"},
+        {"p": "Unscramble: LEARN", "a": "Learn"}
+    ],
+    "Slytherin": [
+        {"p": "Unscramble: SALAZAR", "a": "Salazar"},
+        {"p": "Unscramble: SNAKE", "a": "Snake"},
+        {"p": "Unscramble: BLOODY BARON", "a": "Bloody Baron"},
+        {"p": "Unscramble: BMCNUI", "a": "Cunning"},
+        {"p": "Unscramble: RESROUCE", "a": "Resource"},
+        {"p": "Unscramble: MALFOY", "a": "Malfoy"},
+        {"p": "Unscramble: DUNGEON", "a": "Dungeon"},
+        {"p": "Unscramble: GREEN", "a": "Green"},
+        {"p": "Unscramble: SILVER", "a": "Silver"}
+    ]
+}
+
+# ---- House Pages ----
+def house_page(house_name, bg_image):
+    set_background(f"assets/{bg_image}")
+    st.markdown(f"<h1 class='hp-font'>🦁 {house_name} House</h1>", unsafe_allow_html=True)
+    st.write(f"Welcome to {house_name}! Enjoy quizzes and puzzles with your house colors.")
+    
+    color = house_colors[house_name]
+    
+    tabs = st.tabs(["Quizzes", "Puzzles"])
+    
+    # Quizzes
+    with tabs[0]:
+        for i, q in enumerate(quizzes[house_name]):
+            st.markdown(f"<p style='color:{color}; font-weight:bold;'>{i+1}. {q['q']}</p>", unsafe_allow_html=True)
+            st.radio("", q["options"], key=f"{house_name}_quiz{i}")
+    
+    # Puzzles
+    with tabs[1]:
+        for i, p in enumerate(puzzles[house_name]):
+            st.markdown(f"<p style='color:{color}; font-weight:bold;'>{i+1}. {p['p']}</p>", unsafe_allow_html=True)
+            st.text_input("", key=f"{house_name}_puzzle{i}")
+
+# ---- Home Page ----
+def home():
+    set_background("assets/Hogwarts.jpg")
+    st.markdown("<h1 class='hp-font'>⚡ Welcome to WizardVerse AI ⚡</h1>", unsafe_allow_html=True)
+    st.subheader("Choose your Hogwarts House to begin your magical journey 🧙‍♂️")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    if col1.button("🦁 Gryffindor"): st.session_state["page"] = "Gryffindor"
+    if col2.button("🦡 Hufflepuff"): st.session_state["page"] = "Hufflepuff"
+    if col3.button("🦅 Ravenclaw"): st.session_state["page"] = "Ravenclaw"
+    if col4.button("🐍 Slytherin"): st.session_state["page"] = "Slytherin"
+
+# ---- Navigation ----
+if "page" not in st.session_state: st.session_state["page"] = "Home"
+
+if st.session_state["page"] == "Home": home()
+elif st.session_state["page"] == "Gryffindor": house_page("Gryffindor", "gryffindor_bg.jpg")
+elif st.session_state["page"] == "Hufflepuff": house_page("Hufflepuff", "hufflepuff_bg.jpg")
+elif st.session_state["page"] == "Ravenclaw": house_page("Ravenclaw", "ravenclaw_bg.jpg")
+elif st.session_state["page"] == "Slytherin": house_page("Slytherin", "slytherin_bg.jpg")
+
+# ---- Back Button ----
+if st.session_state["page"] != "Home":
+    if st.button("⬅️ Back to Houses"):
+        st.session_state["page"] = "Home"
 
 
