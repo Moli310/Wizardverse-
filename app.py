@@ -5,13 +5,13 @@ import base64
 # ---- Page Config ----
 st.set_page_config(page_title="WizardVerse AI", layout="wide")
 
-# ---- Helper Functions ----
-def set_background(image_path):
-    """Set a full-page background image."""
-    if not Path(image_path).exists():
-        st.warning(f"⚠ Image {image_path} not found!")
+# ---- Helper function to set background ----
+def set_background(image_path: str):
+    file_path = Path(image_path)
+    if not file_path.exists():
+        st.warning(f"⚠️ Background image not found: {file_path}")
         return
-    with open(image_path, "rb") as f:
+    with open(file_path, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
     st.markdown(
         f"""
@@ -21,74 +21,113 @@ def set_background(image_path):
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            filter: brightness(0.8);
+            background-attachment: fixed;
         }}
         </style>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
-# ---- Front Page ----
-def front_page():
-    set_background("assets/Hogwarts.jpg")
-    st.markdown("<h1 style='text-align:center;color:white;'>🏰 Welcome to WizardVerse AI 🪄</h1>", unsafe_allow_html=True)
+# ---- Sample Quizzes and Puzzles ----
+quizzes = {
+    "Gryffindor": [
+        {"q": "Who founded Gryffindor?", "a": "Godric", "options": ["Godric", "Helga", "Rowena", "Salazar"]},
+        {"q": "What is the Gryffindor emblem?", "a": "Lion", "options": ["Lion", "Badger", "Eagle", "Snake"]},
+        {"q": "Gryffindor common room is in?", "a": "Tower", "options": ["Tower", "Basement", "Library", "Dungeon"]},
+        {"q": "Gryffindor ghost is?", "a": "Nearly Headless Nick", "options": ["Nearly Headless Nick", "Fat Friar", "Grey Lady", "Bloody Baron"]},
+        {"q": "Gryffindor colors?", "a": "Red and Gold", "options": ["Red and Gold", "Yellow and Black", "Blue and Silver", "Green and Silver"]},
+        {"q": "What is Gryffindor's sword made of?", "a": "Silver", "options": ["Silver", "Gold", "Bronze", "Iron"]},
+        {"q": "Famous Gryffindor student?", "a": "Harry Potter", "options": ["Harry Potter", "Draco Malfoy", "Luna Lovegood", "Cedric Diggory"]},
+        {"q": "House known for bravery?", "a": "Gryffindor", "options": ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]},
+        {"q": "Gryffindor founder valued?", "a": "Courage", "options": ["Courage", "Loyalty", "Wisdom", "Ambition"]}
+    ],
+    # Repeat similar 9 quizzes for other houses
+}
 
-    # House selection
+puzzles = {
+    "Gryffindor": [
+        {"p": "Unscramble: DRCIGO", "a": "Godric"},
+        {"p": "Unscramble: NOIL", "a": "Lion"},
+        {"p": "Unscramble: YRAEGFHCIDRNO", "a": "Gryffindor"},
+        {"p": "Unscramble: KNHECYCEEEDHL", "a": "Nearly Headless Nick"},
+        {"p": "Unscramble: VGEANR", "a": "Graven"},
+        {"p": "Unscramble: EVRCOAUG", "a": "Courage"},
+        {"p": "Unscramble: PTHRAY POTTER", "a": "Harry Potter"},
+        {"p": "Unscramble: TSAAEHSVLR", "a": "Salazar"},
+        {"p": "Unscramble: EGONRD", "a": "Donger"}
+    ],
+    # Repeat similar 9 puzzles for other houses
+}
+
+# ---- House Pages ----
+def house_page(house, bg_image):
+    set_background(bg_image)
+    st.title(f"🏰 {house} House")
+    
+    # Tabs for Quizzes, Puzzles
+    tabs = st.tabs(["📝 Quizzes", "🧩 Puzzles"])
+    
+    # ---- Quizzes Tab ----
+    with tabs[0]:
+        st.subheader("Quizzes")
+        for idx, q in enumerate(quizzes.get(house, [])):
+            st.write(f"**Q{idx+1}: {q['q']}**")
+            choice = st.radio(f"Select answer for Q{idx}", q['options'], key=f"{house}_quiz{idx}")
+            if st.button(f"Submit Q{idx+1}", key=f"{house}_submit{idx}"):
+                if choice == q['a']:
+                    st.success("✅ Correct!")
+                else:
+                    st.error(f"❌ Wrong! Correct answer: {q['a']}")
+    
+    # ---- Puzzles Tab ----
+    with tabs[1]:
+        st.subheader("Puzzles")
+        for idx, p in enumerate(puzzles.get(house, [])):
+            st.write(f"Puzzle {idx+1}: {p['p']}")
+            ans = st.text_input("Your Answer", key=f"{house}_puzzle{idx}")
+            if st.button(f"Check Puzzle {idx+1}", key=f"{house}_check{idx}"):
+                if ans.strip().lower() == p['a'].lower():
+                    st.success("🎉 Correct!")
+                else:
+                    st.error(f"❌ Try Again! Answer: {p['a']}")
+
+# ---- Home Page ----
+def home():
+    st.title("⚡ Welcome to WizardVerse AI ⚡")
+    st.subheader("Choose your Hogwarts House 🧙‍♂️")
     col1, col2, col3, col4 = st.columns(4)
-    houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
-    for col, house in zip([col1, col2, col3, col4], houses):
-        with col:
-            if st.button(house):
-                st.session_state['house'] = house
-            # House icons
-            icon_path = f"assets/{house.lower()}.png"
-            if Path(icon_path).exists():
-                st.image(icon_path, use_container_width=True)
-            else:
-                st.write(f"Icon missing: {house}")
+    
+    with col1:
+        if st.button("🦁 Gryffindor"):
+            st.session_state["page"] = "Gryffindor"
+    with col2:
+        if st.button("🦡 Hufflepuff"):
+            st.session_state["page"] = "Hufflepuff"
+    with col3:
+        if st.button("🦅 Ravenclaw"):
+            st.session_state["page"] = "Ravenclaw"
+    with col4:
+        if st.button("🐍 Slytherin"):
+            st.session_state["page"] = "Slytherin"
 
-# ---- House Page ----
-def house_page(house):
-    set_background(f"assets/{house.lower()}_bg.jpg")
-    st.markdown(f"<h1 style='text-align:center;color:white;'>{house} House 🏰</h1>", unsafe_allow_html=True)
+# ---- Navigation ----
+if "page" not in st.session_state:
+    st.session_state["page"] = "Home"
 
-    if st.button("⬅ Back to Hogwarts"):
-        st.session_state['house'] = None
+# Background images mapping
+bg_images = {
+    "Gryffindor": "assets/gryffindor_bg.jpg",
+    "Hufflepuff": "assets/hufflepuff_bg.jpg",
+    "Ravenclaw": "assets/ravenclaw_bg.jpg",
+    "Slytherin": "assets/slytherin_bg.jpg"
+}
 
-    # Simple Quiz
-    st.subheader("📝 Quiz")
-    question = f"Who founded {house}?"
-    answers = {
-        "Gryffindor": "Godric",
-        "Hufflepuff": "Helga",
-        "Ravenclaw": "Rowena",
-        "Slytherin": "Salazar"
-    }
-    choice = st.radio(question, list(answers.values()))
-    if st.button("Submit Answer"):
-        if choice == answers[house]:
-            st.success("✅ Correct!")
-        else:
-            st.error(f"❌ Wrong! Correct answer: {answers[house]}")
-
-    # Simple Puzzle
-    st.subheader("🧩 Puzzle")
-    scrambled = "".join(reversed(house))
-    st.write(f"Unscramble the house name: {scrambled}")
-    answer = st.text_input("Your Answer")
-    if st.button("Check Puzzle"):
-        if answer.strip().lower() == house.lower():
-            st.success("🎉 Correct!")
-        else:
-            st.error("❌ Try Again!")
-
-# ---- Main ----
-if 'house' not in st.session_state:
-    st.session_state['house'] = None
-
-if st.session_state['house'] is None:
-    front_page()
+if st.session_state["page"] == "Home":
+    set_background("assets/Hogwarts.jpg")
+    home()
 else:
-    house_page(st.session_state['house'])
+    house_page(st.session_state["page"], bg_images[st.session_state["page"]])
+    if st.button("⬅️ Back to Houses"):
+        st.session_state["page"] = "Home"
 
 
