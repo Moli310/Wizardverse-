@@ -28,8 +28,9 @@ def set_background(image_path):
         """, unsafe_allow_html=True
     )
 
+# ---- Front Page ----
 def front_page():
-    set_background("assets/hogwarts.jpg")
+    set_background("assets/Hogwarts.jpg")  # Front page background
     st.markdown("<h1 style='text-align:center;color:white;'>🏰 Welcome to WizardVerse AI 🪄</h1>", unsafe_allow_html=True)
 
     # House selection with images
@@ -39,10 +40,11 @@ def front_page():
         with col:
             if st.button(f"{house}"):
                 st.session_state['house'] = house
-            st.image(f"assets/{house.lower()}.png", use_column_width=True)
+            st.image(f"assets/{house.lower()}.png", use_container_width=True)  # Updated param
 
+# ---- House Page ----
 def house_page(house):
-    set_background(f"assets/{house.lower()}.jpg")
+    set_background(f"assets/{house.lower()}_bg.jpg")  # House-specific background
     st.markdown(f"<h1 style='text-align:center;color:white;'>{house} House 🏰</h1>", unsafe_allow_html=True)
 
     # Navigation
@@ -51,36 +53,45 @@ def house_page(house):
 
     # --- Dataset-driven Quizzes ---
     st.subheader("📝 Quizzes")
-    quiz_df = pd.read_csv(f"datasets/{house.lower()}_quiz.csv")  # Example CSV: columns = question, option1..4, answer
-    for idx, row in quiz_df.iterrows():
-        st.write(f"**Q{idx+1}: {row['question']}**")
-        options = [row['option1'], row['option2'], row['option3'], row['option4']]
-        ans = st.radio(f"Select answer for Q{idx+1}", options, key=f"quiz{idx}")
-        if st.button(f"Submit Q{idx+1}", key=f"submit{idx}"):
-            if ans == row['answer']:
-                st.success("✅ Correct!")
-            else:
-                st.error(f"❌ Wrong! Correct answer: {row['answer']}")
+    try:
+        quiz_df = pd.read_csv(f"datasets/{house.lower()}_quiz.csv")
+        for idx, row in quiz_df.iterrows():
+            st.write(f"**Q{idx+1}: {row['question']}**")
+            options = [row['option1'], row['option2'], row['option3'], row['option4']]
+            ans = st.radio(f"Select answer for Q{idx+1}", options, key=f"quiz{idx}")
+            if st.button(f"Submit Q{idx+1}", key=f"submit{idx}"):
+                if ans == row['answer']:
+                    st.success("✅ Correct!")
+                else:
+                    st.error(f"❌ Wrong answer! Correct: {row['answer']}")
+    except FileNotFoundError:
+        st.warning("Quiz dataset not found for this house!")
 
     # --- Dataset-driven Puzzles ---
     st.subheader("🧩 Puzzles")
-    puzzle_df = pd.read_csv(f"datasets/{house.lower()}_puzzles.csv")  # Example: columns = puzzle, answer
-    for idx, row in puzzle_df.iterrows():
-        st.write(f"Puzzle {idx+1}: {row['puzzle']}")
-        user_ans = st.text_input("Your Answer", key=f"puzzle{idx}")
-        if st.button(f"Check Puzzle {idx+1}", key=f"check{idx}"):
-            if user_ans.strip().lower() == row['answer'].lower():
-                st.success("🎉 Correct!")
-            else:
-                st.error(f"❌ Try Again! Answer: {row['answer']}")
+    try:
+        puzzle_df = pd.read_csv(f"datasets/{house.lower()}_puzzles.csv")
+        for idx, row in puzzle_df.iterrows():
+            st.write(f"Puzzle {idx+1}: {row['puzzle']}")
+            user_ans = st.text_input("Your Answer", key=f"puzzle{idx}")
+            if st.button(f"Check Puzzle {idx+1}", key=f"check{idx}"):
+                if user_ans.strip().lower() == row['answer'].lower():
+                    st.success("🎉 Correct!")
+                else:
+                    st.error(f"❌ Try Again! Answer: {row['answer']}")
+    except FileNotFoundError:
+        st.warning("Puzzle dataset not found for this house!")
 
     # --- Spells ---
     st.subheader("🪄 Spells")
-    spells_df = pd.read_csv("datasets/spells.csv")  # columns = spell, effect
-    spell_choice = st.selectbox("Choose a spell", spells_df['spell'])
-    if st.button("Cast Spell"):
-        effect = spells_df[spells_df['spell'] == spell_choice]['effect'].values[0]
-        st.info(f"{spell_choice} spell casted! ✨ Effect: {effect}")
+    try:
+        spells_df = pd.read_csv("datasets/spells.csv")
+        spell_choice = st.selectbox("Choose a spell", spells_df['spell'])
+        if st.button("Cast Spell"):
+            effect = spells_df[spells_df['spell'] == spell_choice]['effect'].values[0]
+            st.info(f"{spell_choice} spell casted! ✨ Effect: {effect}")
+    except FileNotFoundError:
+        st.warning("Spells dataset not found!")
 
 # ---- Main App Logic ----
 if 'house' not in st.session_state:
