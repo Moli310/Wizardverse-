@@ -27,11 +27,18 @@ def set_background(image_path):
         </style>
         """, unsafe_allow_html=True
     )
+# Front page background
+set_background("assets/Hogwarts.jpg")  # must match exactly
 
-# ---- Front Page ----
-def front_page():
-    set_background("assets/Hogwarts.jpg")  # Front page background
-    st.markdown("<h1 style='text-align:center;color:white;'>🏰 Welcome to WizardVerse AI 🪄</h1>", unsafe_allow_html=True)
+# House icons on front page
+houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
+for col, house in zip([col1, col2, col3, col4], houses):
+    with col:
+        if st.button(f"{house}"):
+            st.session_state['house'] = house
+        # Use exact file names
+        st.image(f"assets/{house.lower()}.png", use_container_width=True)
+
 
     # House selection with images
     col1, col2, col3, col4 = st.columns(4)
