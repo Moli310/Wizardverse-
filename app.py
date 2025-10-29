@@ -27,6 +27,16 @@ def set_background(image_path):
         </style>
         """, unsafe_allow_html=True
     )
+    # Create columns BEFORE using them
+col1, col2, col3, col4 = st.columns(4)
+
+houses = ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]
+for col, house in zip([col1, col2, col3, col4], houses):
+    with col:
+        if st.button(f"{house}"):
+            st.session_state['house'] = house
+        st.image(f"assets/{house.lower()}.png", use_container_width=True)
+
 # Front page background
 set_background("assets/Hogwarts.jpg")  # must match exactly
 
