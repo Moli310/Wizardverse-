@@ -14,15 +14,15 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ---- House Colors ----
+# ---- House Colors (adjusted for readability) ----
 house_colors = {
-    "Gryffindor": "#7F0909",  # dark red
-    "Hufflepuff": "#EEE117",  # yellow
-    "Ravenclaw": "#000A90",   # dark blue
-    "Slytherin": "#1A472A"    # dark green
+    "Gryffindor": "#FFDD00",  # bright gold
+    "Hufflepuff": "#000000",  # black
+    "Ravenclaw": "#FFFFFF",   # white
+    "Slytherin": "#FFFFFF"    # white
 }
 
-# ---- Background Function ----
+# ---- Background Function with Overlay ----
 def set_background(image_path: str):
     file_path = Path(image_path)
     if not file_path.exists():
@@ -30,8 +30,8 @@ def set_background(image_path: str):
         return
     with open(file_path, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
-    st.markdown(
-        f"""
+    
+    st.markdown(f"""
         <style>
         .stApp {{
             background-image: url("data:image/jpeg;base64,{encoded}");
@@ -39,13 +39,23 @@ def set_background(image_path: str):
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
+            position: relative;
+        }}
+        .overlay {{
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5); /* semi-transparent black overlay */
+            z-index: 0;
+        }}
+        .stApp > .main {{
+            position: relative;
+            z-index: 1;
         }}
         </style>
-        """,
-        unsafe_allow_html=True,
-    )
+        <div class="overlay"></div>
+    """, unsafe_allow_html=True)
 
-# ---- Quiz & Puzzle Data ----
+# ---- Quiz & Puzzle Data (9 each) ----
 quizzes = {
     "Gryffindor": [
         {"q": "Who founded Gryffindor?", "a": "Godric", "options": ["Godric", "Helga", "Rowena", "Salazar"]},
@@ -93,6 +103,7 @@ quizzes = {
     ]
 }
 
+# ---- Puzzle Data (9 each) ----
 puzzles = {
     "Gryffindor": [
         {"p": "Unscramble: DRCIGO", "a": "Godric"},
@@ -140,12 +151,10 @@ puzzles = {
     ]
 }
 
-# ---- House Pages ----
+# ---- House Page Function ----
 def house_page(house_name, bg_image):
     set_background(f"assets/{bg_image}")
-    st.markdown(f"<h1 class='hp-font'>🦁 {house_name} House</h1>", unsafe_allow_html=True)
-    st.write(f"Welcome to {house_name}! Enjoy quizzes and puzzles with your house colors.")
-    
+    st.markdown(f"<h1 class='hp-font'>{house_name} House</h1>", unsafe_allow_html=True)
     color = house_colors[house_name]
     
     tabs = st.tabs(["Quizzes", "Puzzles"])
@@ -187,5 +196,4 @@ elif st.session_state["page"] == "Slytherin": house_page("Slytherin", "slytherin
 if st.session_state["page"] != "Home":
     if st.button("⬅️ Back to Houses"):
         st.session_state["page"] = "Home"
-
 
