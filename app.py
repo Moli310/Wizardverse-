@@ -120,7 +120,7 @@ puzzles = {
         {"p": "Unscramble: ROWENA", "a": "Rowena"},
         {"p": "Unscramble: EAGLE", "a": "Eagle"},
         {"p": "Unscramble: RAVNCLAW", "a": "Ravenclaw"},
-        {"p": "Unscramble: YSIDOMW , "a": "Wisdom"},
+        {"p": "Unscramble: YSIDOMW", "a": "Wisdom"},
         {"p": "Unscramble: LNAUERIG", "a": "Learning"},
         {"p": "Unscramble: LUNA LOVEGOOD", "a": "Luna Lovegood"},
         {"p": "Unscramble: TOWER", "a": "Tower"},
