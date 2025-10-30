@@ -44,6 +44,18 @@ def set_background(image_path):
     </style>
     """, unsafe_allow_html=True)
 
+from PIL import Image
+
+# Load the Hogwarts image
+image = Image.open("assets/Hogwarts.jpg")  # adjust extension if it's .png
+
+# Display the image as the front page banner
+st.image(image, use_column_width=True)
+
+st.title("Welcome to Wizardverse AI 🪄")
+st.write("Explore your magical house, cast spells, and discover your wizarding path!")
+
+
 # ---- Quiz & Puzzle Data (9 each) ----
 quizzes = {
     "Gryffindor": [
