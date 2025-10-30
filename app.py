@@ -22,39 +22,66 @@ house_colors = {
     "Slytherin": "#FFFFFF"    # white
 }
 
-# ---- Background Function with overlay ----
-def set_background(image_path):
-    file_path = Path(image_path)
-    if not file_path.exists():
-        st.warning(f"⚠️ Background image not found: {file_path}")
-        return
-    with open(file_path, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
-    
-    st.markdown(f"""
-    <style>
-    .stApp {{
-        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-                    url("data:image/jpeg;base64,{encoded}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }}
-    </style>
-    """, unsafe_allow_html=True)
+# ---- Home Page ----
+def home():
+    set_background("assets/Hogwarts.jpg")
 
-from PIL import Image
+    # Centered cinematic hero section
+    st.markdown(
+        """
+        <style>
+        .hero-container {
+            position: relative;
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+        }
+        .hero-image {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0px 0px 30px 5px rgba(0, 0, 0, 0.8);
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+        }
+        .hero-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Creepster', cursive;
+            font-size: 80px;
+            color: gold;
+            text-shadow: 4px 4px 20px black, 0 0 25px gold, 0 0 50px gold;
+        }
+        </style>
 
-# Load the Hogwarts image
-image = Image.open("assets/Hogwarts.jpg")  # adjust extension if it's .png
+        <div class="hero-container">
+            <img src="assets/Hogwarts.jpg" class="hero-image">
+            <div class="hero-overlay"></div>
+            <div class="hero-text">WizardVerse AI</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-# Display the image as the front page banner
-st.image(image, use_column_width=True)
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.subheader("Choose your Hogwarts House to begin your magical journey 🧙‍♂️")
 
-st.title("Welcome to Wizardverse AI 🪄")
-st.write("Explore your magical house, cast spells, and discover your wizarding path!")
+    # House buttons
+    col1, col2, col3, col4 = st.columns(4)
+    if col1.button("🦁 Gryffindor"): st.session_state["page"] = "Gryffindor"
+    if col2.button("🦡 Hufflepuff"): st.session_state["page"] = "Hufflepuff"
+    if col3.button("🦅 Ravenclaw"): st.session_state["page"] = "Ravenclaw"
+    if col4.button("🐍 Slytherin"): st.session_state["page"] = "Slytherin"
 
+   
 
 # ---- Quiz & Puzzle Data (9 each) ----
 quizzes = {
