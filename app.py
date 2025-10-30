@@ -2,10 +2,10 @@ import streamlit as st
 from pathlib import Path
 import base64
 
-# ---- Page Config ----
+#  Page Config ----
 st.set_page_config(page_title="WizardVerse AI", layout="wide")
 
-# ---- Google Font for Harry Potter style 
+#  Google Font for Harry Potter style 
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
 <style>
