@@ -22,64 +22,7 @@ house_colors = {
     "Slytherin": "#FFFFFF"    # white
 }
 
-# ---- Home Page ----
-def home():
-    set_background("assets/Hogwarts.jpg")
-
-    # Centered cinematic hero section
-    st.markdown(
-        """
-        <style>
-        .hero-container {
-            position: relative;
-            text-align: center;
-            color: white;
-            margin-top: 50px;
-        }
-        .hero-image {
-            width: 100%;
-            border-radius: 15px;
-            box-shadow: 0px 0px 30px 5px rgba(0, 0, 0, 0.8);
-        }
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            border-radius: 15px;
-        }
-        .hero-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-family: 'Creepster', cursive;
-            font-size: 80px;
-            color: gold;
-            text-shadow: 4px 4px 20px black, 0 0 25px gold, 0 0 50px gold;
-        }
-        </style>
-
-        <div class="hero-container">
-            <img src="assets/Hogwarts.jpg" class="hero-image">
-            <div class="hero-overlay"></div>
-            <div class="hero-text">WizardVerse AI</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.subheader("Choose your Hogwarts House to begin your magical journey 🧙‍♂️")
-
-    # House buttons
-    col1, col2, col3, col4 = st.columns(4)
-    if col1.button("🦁 Gryffindor"): st.session_state["page"] = "Gryffindor"
-    if col2.button("🦡 Hufflepuff"): st.session_state["page"] = "Hufflepuff"
-    if col3.button("🦅 Ravenclaw"): st.session_state["page"] = "Ravenclaw"
-    if col4.button("🐍 Slytherin"): st.session_state["page"] = "Slytherin"
+    
 
    
 
