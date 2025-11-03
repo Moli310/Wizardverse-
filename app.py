@@ -22,27 +22,7 @@ house_colors = {
     "Slytherin": "#FFFFFF"    # white
 }
 
-# ---- Background Function with overlay ----
-def set_background(image_path):
-    file_path = Path(assets/𝐇𝐨𝐠𝐰𝐚𝐫𝐭𝐬.jpg)
-    if not file_path.exists():
-        st.warning(f"⚠️ Background image not found: {file_path}")
-        return
-    with open(file_path, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
-    
-    st.markdown(f"""
-    <style>
-    .stApp {{
-        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-                    url("data:image/jpeg;base64,{encoded}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }}
-    </style>
-    """, unsafe_allow_html=True)
+
 
 # ---- Quiz & Puzzle Data (9 each) ----
 quizzes = {
@@ -114,7 +94,7 @@ def house_page(house_name, bg_image):
 
 # ---- Home Page ----
 def home():
-    set_background("assets/Hogwarts.jpg")  # Add Hogwarts image as home background
+    set_background("assets/𝐇𝐨𝐠𝐰𝐚𝐫𝐭𝐬.jpg")  # your Hogwarts background image
     st.markdown(
         """
         <h1 style='text-align: center; color: #FFD700; font-family: "Harry Potter", cursive; font-size: 60px;'>
