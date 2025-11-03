@@ -185,7 +185,8 @@ elif st.session_state["page"] == "Hufflepuff":
 elif st.session_state["page"] == "Ravenclaw":
     house_page("Ravenclaw", "ravenclaw_bg.jpg")
 elif st.session_state["page"] == "Slytherin":
-    house_page("Slytherin", "slytherin_bg.jpg")
+    house_page("Slytherin", "serpent_bg.jpg")
+
 
 # ---------- Back Button ----------
 if st.session_state["page"] != "Home":
