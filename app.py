@@ -114,9 +114,18 @@ def house_page(house_name, bg_image):
 
 # ---- Home Page ----
 def home():
-    set_background("assets/Hogwarts.jpg")
-    st.markdown("<h1 class='hp-font'>⚡ Welcome to WizardVerse AI ⚡</h1>", unsafe_allow_html=True)
-    st.subheader("Choose your Hogwarts House to begin your magical journey 🧙‍♂️")
+    set_background("assets/Hogwarts.jpg")  # Add Hogwarts image as home background
+    st.markdown(
+        """
+        <h1 style='text-align: center; color: #FFD700; font-family: "Harry Potter", cursive; font-size: 60px;'>
+            ⚡ Welcome to WizardVerse AI ⚡
+        </h1>
+        <h3 style='text-align: center; color: #E0E0E0; font-family: "Harry Potter", cursive;'>
+            Choose your Hogwarts House to begin your magical journey 🧙‍♂️
+        </h3>
+        """,
+        unsafe_allow_html=True
+    )
     
     col1, col2, col3, col4 = st.columns(4)
     if col1.button("🦁 Gryffindor"): st.session_state["page"] = "Gryffindor"
