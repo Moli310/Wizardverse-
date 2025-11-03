@@ -5,7 +5,7 @@ import base64
 # ---- Page Config ----
 st.set_page_config(page_title="WizardVerse AI", layout="wide")
 
-# ---- Google Font for Harry Potter style -
+# ---- Google Font for Harry Potter style ----
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
 <style>
@@ -22,9 +22,27 @@ house_colors = {
     "Slytherin": "#FFFFFF"    # white
 }
 
+# ---- Background Function with overlay ----
+def set_background(image_path):
+    file_path = Path(image_path)
+    if not file_path.exists():
+        st.warning(f"⚠️ Background image not found: {file_path}")
+        return
+    with open(file_path, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
     
-
-   
+    st.markdown(f"""
+    <style>
+    .stApp {{
+        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                    url("data:image/jpeg;base64,{encoded}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
 
 # ---- Quiz & Puzzle Data (9 each) ----
 quizzes = {
