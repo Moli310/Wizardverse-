@@ -2,6 +2,51 @@ import streamlit as st
 from pathlib import Path
 import base64
 
+import unicodedata
+from pathlib import Path
+
+def find_asset(filename, folder="assets"):
+    folder_path = Path(folder)
+    if not folder_path.exists():
+        return None
+    target_norm = unicodedata.normalize("NFC", filename).casefold()
+    for f in folder_path.iterdir():
+        if unicodedata.normalize("NFC", f.name).casefold() == target_norm:
+            return str(f)
+    # try contains match
+    for f in folder_path.iterdir():
+        if target_norm in unicodedata.normalize("NFC", f.name).casefold():
+            return str(f)
+    return None
+
+def set_background(image_path):
+    # try exact first
+    p = Path(image_path)
+    if not p.exists():
+        # try to auto-find a matching file in assets
+        found = find_asset(p.name, p.parent)
+        if found:
+            p = Path(found)
+        else:
+            st.warning(f"⚠️ Background image not found: {image_path}")
+            return
+    with open(p, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    st.markdown(f"""
+    <style>
+    .stApp {{
+        background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+                    url("data:image/jpeg;base64,{encoded}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+
+
 # ---- Page Config ----
 st.set_page_config(page_title="WizardVerse AI", layout="wide")
 
