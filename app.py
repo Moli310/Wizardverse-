@@ -63,10 +63,10 @@ h1 { animation: glow 2s ease-in-out infinite alternate; text-align:center; color
 
 # ---------- House Colors ----------
 house_colors = {
-    "Gryffindor": "#FFDD00",
-    "Hufflepuff": "#FFDB00",
-    "Ravenclaw": "#0E1A40",
-    "Slytherin": "#2A623D"
+    "Gryffindor": "#FFD700",
+    "Hufflepuff": "#000000",
+    "Ravenclaw": "#C0C0FF",
+    "Slytherin": "#C8E6C9"
 }
 
 # ---------- Quiz & Puzzle Data ----------
