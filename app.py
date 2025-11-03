@@ -46,48 +46,27 @@ def set_background(image_path):
 # ---------- Page Config ----------
 st.set_page_config(page_title="WizardVerse AI", layout="wide")
 
-# ---------- Global Fonts & Styles ----------
+# ---------- Global Fonts ----------
 st.markdown("""
 <link href="https://fonts.cdnfonts.com/css/harry-p" rel="stylesheet">
 <style>
 html, body, [class*="css"] { font-family: 'Harry P', sans-serif; }
 h1, h2, h3 { font-family: 'Harry P', sans-serif; letter-spacing: 2px; }
-
-/* Title Glow */
 @keyframes glow {
   0% { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffa500; }
   50% { text-shadow: 0 0 20px #fff, 0 0 30px #ffd700; }
   100% { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffa500; }
 }
-h1 {
-  animation: glow 2s ease-in-out infinite alternate;
-  text-align: center;
-  color: gold;
-}
-
-/* Buttons */
-div.stButton > button {
-    border-radius: 12px;
-    border: 2px solid transparent;
-    color: white !important;
-    font-weight: bold;
-    padding: 0.6em 1.2em;
-    transition: all 0.3s ease-in-out;
-    background-color: rgba(0,0,0,0.6);
-}
-div.stButton > button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(255,255,255,0.7);
-}
+h1 { animation: glow 2s ease-in-out infinite alternate; text-align:center; color:gold; }
 </style>
 """, unsafe_allow_html=True)
 
 # ---------- House Colors ----------
 house_colors = {
     "Gryffindor": "#FFDD00",
-    "Hufflepuff": "#000000",
-    "Ravenclaw": "#FFFFFF",
-    "Slytherin": "#FFFFFF"
+    "Hufflepuff": "#FFDB00",
+    "Ravenclaw": "#0E1A40",
+    "Slytherin": "#2A623D"
 }
 
 # ---------- Quiz & Puzzle Data ----------
@@ -138,11 +117,49 @@ quizzes = {
     ]
 }
 
+# ---------- Home Page ----------
+def home():
+    set_background("assets/𝐇𝐨𝐠𝐰𝐚𝐫𝐭𝐬.jpg")
+    # Home page button style
+    st.markdown("""
+    <style>
+    div.stButton > button {
+        border-radius: 12px; border:2px solid transparent; color:white !important;
+        font-weight:bold; padding:0.6em 1.2em; transition: all 0.3s ease-in-out;
+        background-color: rgba(0,0,0,0.6);
+    }
+    div.stButton > button:hover { transform:scale(1.1); box-shadow:0 0 20px rgba(255,255,255,0.7); }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<h1>⚡ Welcome to WizardVerse AI ⚡</h1>", unsafe_allow_html=True)
+    col1, col2, col3, col4 = st.columns(4)
+    if col1.button(" Gryffindor"): st.session_state["page"] = "Gryffindor"
+    if col2.button(" Hufflepuff"): st.session_state["page"] = "Hufflepuff"
+    if col3.button(" Ravenclaw"): st.session_state["page"] = "Ravenclaw"
+    if col4.button("Slytherin"): st.session_state["page"] = "Slytherin"
+
 # ---------- House Page ----------
 def house_page(house_name, bg_image):
     set_background(f"assets/{bg_image}")
-    st.markdown(f"<h1>{house_name} House</h1>", unsafe_allow_html=True)
+
+    # House-specific button style
     color = house_colors.get(house_name, "white")
+    st.markdown(f"""
+    <style>
+    div.stButton > button {{
+        border-radius:12px; border:2px solid {color}; font-weight:bold;
+        padding:0.6em 1.2em; background-color: rgba(0,0,0,0.6); color:white !important;
+        box-shadow:0 0 10px {color};
+        transition: all 0.3s ease-in-out;
+    }}
+    div.stButton > button:hover {{
+        transform: scale(1.1); box-shadow: 0 0 25px {color}; color: {color} !important;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"<h1>{house_name} House</h1>", unsafe_allow_html=True)
     tabs = st.tabs(["Quizzes", "Puzzles"])
 
     with tabs[0]:
@@ -151,22 +168,9 @@ def house_page(house_name, bg_image):
             st.radio("", q["options"], key=f"{house_name}_quiz{i}")
 
     with tabs[1]:
-        for i, p in enumerate(quizzes[house_name]):
-            st.markdown(f"<p style='color:{color}; font-weight:bold;'>{i+1}. {p['q']}</p>", unsafe_allow_html=True)
+        for i, q in enumerate(quizzes[house_name]):
+            st.markdown(f"<p style='color:{color}; font-weight:bold;'>{i+1}. {q['q']}</p>", unsafe_allow_html=True)
             st.text_input("", key=f"{house_name}_puzzle{i}")
-
-# ---------- Home Page ----------
-def home():
-    set_background("assets/𝐇𝐨𝐠𝐰𝐚𝐫𝐭𝐬.jpg")
-    st.markdown("""
-        <h1>⚡ Welcome to WizardVerse AI ⚡</h1>
-        <h3 style='text-align:center; color:#E0E0E0;'>Choose your Hogwarts House to begin your magical journey 🧙‍♂️</h3>
-    """, unsafe_allow_html=True)
-    col1, col2, col3, col4 = st.columns(4)
-    if col1.button("🦁 Gryffindor"): st.session_state["page"] = "Gryffindor"
-    if col2.button("🦡 Hufflepuff"): st.session_state["page"] = "Hufflepuff"
-    if col3.button("🦅 Ravenclaw"): st.session_state["page"] = "Ravenclaw"
-    if col4.button("🐍 Slytherin"): st.session_state["page"] = "Slytherin"
 
 # ---------- Navigation ----------
 if "page" not in st.session_state:
@@ -185,7 +189,8 @@ elif st.session_state["page"] == "Slytherin":
 
 # ---------- Back Button ----------
 if st.session_state["page"] != "Home":
-    if st.button("⬅️ Back to Houses"):
+    if st.button("Back to Houses"):
         st.session_state["page"] = "Home"
+
 
 
