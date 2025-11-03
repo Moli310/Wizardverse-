@@ -24,7 +24,7 @@ house_colors = {
 
 # ---- Background Function with overlay ----
 def set_background(image_path):
-    file_path = Path(image_path)
+    file_path = Path("D:\Wizardverse AI\assets\Hogwarts.jpg")
     if not file_path.exists():
         st.warning(f"⚠️ Background image not found: {file_path}")
         return
