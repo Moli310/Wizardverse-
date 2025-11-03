@@ -3,6 +3,127 @@ from pathlib import Path
 import base64
 import unicodedata
 
+# ---------- Helper: Find Asset ----------
+def find_asset(filename, folder="assets"):
+    folder_path = Path(folder)
+    if not folder_path.exists():
+        return None
+    target_norm = unicodedata.normalize("NFC", filename).casefold()
+    for f in folder_path.iterdir():
+        if unicodedata.normalize("NFC", f.name).casefold() == target_norm:
+            return str(f)
+    for f in folder_path.iterdir():
+        if target_norm in unicodedata.normalize("NFC", f.name).casefold():
+            return str(f)
+    return None
+
+# ---------- Helper: Set Background ----------
+def set_background(image_path):
+    p = Path(image_path)
+    if not p.exists():
+        found = find_asset(p.name, p.parent)
+        if found:
+            p = Path(found)
+        else:
+            st.warning(f"⚠️ Background image not found: {image_path}")
+            return
+    with open(p, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    st.markdown(f"""
+    <style>
+    .stApp {{
+        background:
+            linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+            url("data:image/jpeg;base64,{encoded}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+# ---------- Page Config ----------
+st.set_page_config(page_title="WizardVerse AI", layout="wide")
+
+# ---------- Global Fonts & Styles ----------
+st.markdown("""
+<link href="https://fonts.cdnfonts.com/css/harry-p" rel="stylesheet">
+<style>
+html, body, [class*="css"] {
+    font-family: 'Harry P', sans-serif;
+}
+h1, h2, h3 {
+    font-family: 'Harry P', sans-serif;
+    letter-spacing: 2px;
+}
+
+/* Title Glow */
+@keyframes glow {
+  0% { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffa500; }
+  50% { text-shadow: 0 0 20px #fff, 0 0 30px #ffd700; }
+  100% { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffa500; }
+}
+h1 {
+  animation: glow 2s ease-in-out infinite alternate;
+  text-align: center;
+  color: gold;
+}
+
+/* Magical Buttons */
+div.stButton > button {
+    font-family: 'Harry P', sans-serif;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    color: white !important;
+    font-weight: bold;
+    padding: 0.6em 1.2em;
+    transition: all 0.3s ease-in-out;
+    background-color: rgba(0,0,0,0.6);
+}
+
+/* House Specific Glows */
+div.stButton > button[data-house="Gryffindor"] {
+    box-shadow: 0 0 10px #ff4500;
+    border-color: #ff0000;
+}
+div.stButton > button[data-house="Gryffindor"]:hover {
+    background-color: #ff0000;
+    color: gold !important;
+    box-shadow: 0 0 25px #ff4500;
+    transform: scale(1.1);
+}
+
+div.stButton > button[data-house="Hufflepuff"] {
+    box-shadow: 0 0 10px #ffdb00;
+    border-color: #ffdb00;
+}
+div.stButton > button[data-house="Hufflepuff"]:hover {
+    background-color: #ffdb00;
+    color: black !important;
+    box-shadow: 0 0 25px #ffdb00;
+    transform: scale(1.1);
+}
+
+div.stButton > button[data-house="Ravenclaw"] {
+    box-shadow: 0 0 10px #4169e1;
+    border-color: #1e90ff;
+}
+div.stButton > button[data-house="Ravenclaw"]:hover {
+    background-color: #1e90ff;
+    color: white !important;
+    box-shadow: 0 0 25px #87cefa;
+    transform: scale(1.1);
+}
+
+div.stButton > button[data-house="Slytherin"] {
+    box-shadow: 0 0 10px #2a
+
+import streamlit as st
+from pathlib import Path
+import base64
+import unicodedata
+
 # ---------- Helper: Find Asset (handles Unicode filenames) ----------
 def find_asset(filename, folder="assets"):
     folder_path = Path(folder)
@@ -168,52 +289,6 @@ def house_page(house_name, bg_image):
             st.text_input("", key=f"{house_name}_puzzle{i}")
 
 # ---------- Home Page ----------
-
-# --- HOUSE COLORS ---
-HOUSE_COLORS = {
-    "Gryffindor": {"bg": "#7F0909", "text": "#FFD700"},     # Dark red & gold
-    "Slytherin": {"bg": "#1A472A", "text": "#B8C1B1"},      # Green & silver
-    "Ravenclaw": {"bg": "#0E1A40", "text": "#946B2D"},      # Blue & bronze
-    "Hufflepuff": {"bg": "#EEE117", "text": "#000000"},     # Yellow & black
-}
-
-def home():
-    set_background("assets/Hogwarts.jpg")
-
-    st.markdown(
-        "<h1 style='text-align: center; font-family: HarryP; font-size: 60px;'>Welcome to WizardVerse AI</h1>",
-        unsafe_allow_html=True,
-    )
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    col1, col2, col3, col4 = st.columns(4)
-    houses = ["Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff"]
-
-    for col, house in zip([col1, col2, col3, col4], houses):
-        bg = HOUSE_COLORS[house]["bg"]
-        text_color = HOUSE_COLORS[house]["text"]
-
-        with col:
-            st.markdown(
-                f"""
-                <div style='background-color: {bg}; padding: 25px; border-radius: 15px; text-align: center;'>
-                    <h2 style='color: {text_color}; font-family: HarryP;'>
-                        {house}
-                    </h2>
-                    <form action='#{house.lower()}'>
-                        <button style='background-color: {text_color}; color: {bg};
-                                       border: none; border-radius: 10px;
-                                       padding: 10px 20px; font-weight: bold;
-                                       cursor: pointer;'>
-                            Enter Common Room
-                        </button>
-                    </form>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
 def home():
     set_background("assets/𝐇𝐨𝐠𝐰𝐚𝐫𝐭𝐬.jpg")
     st.markdown("""
@@ -239,5 +314,4 @@ elif st.session_state["page"] == "Slytherin": house_page("Slytherin", "serpent_b
 if st.session_state["page"] != "Home":
     if st.button("⬅️ Back to Houses"):
         st.session_state["page"] = "Home"
-
 
