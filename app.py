@@ -1,105 +1,197 @@
 import streamlit as st
-import base64
 from pathlib import Path
+import base64
+import unicodedata
 
-# ---- Page Config ----
+# ---------- Helper: Find Asset ----------
+def find_asset(filename, folder="assets"):
+    folder_path = Path(folder)
+    if not folder_path.exists():
+        return None
+    target_norm = unicodedata.normalize("NFC", filename).casefold()
+    for f in folder_path.iterdir():
+        if unicodedata.normalize("NFC", f.name).casefold() == target_norm:
+            return str(f)
+    for f in folder_path.iterdir():
+        if target_norm in unicodedata.normalize("NFC", f.name).casefold():
+            return str(f)
+    return None
+
+# ---------- Helper: Set Background ----------
+def set_background(image_path):
+    p = Path(image_path)
+    if not p.exists():
+        found = find_asset(p.name, p.parent)
+        if found:
+            p = Path(found)
+        else:
+            st.warning(f"⚠️ Background image not found: {image_path}")
+            return
+    with open(p, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    st.markdown(f"""
+    <style>
+    .stApp {{
+        background:
+            linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+            url("data:image/jpeg;base64,{encoded}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+# ---------- Page Config ----------
 st.set_page_config(page_title="WizardVerse AI", layout="wide")
 
-# ---- Helper function to set background ----
-def set_background(image_path: str):
-    """Encodes and sets a local image as Streamlit background."""
-    file_path = Path(image_path)
-    if not file_path.exists():
-        st.warning(f"⚠️ Background image not found: {file_path}")
-        return
+# ---------- Global Fonts ----------
+st.markdown("""
+<link href="https://fonts.cdnfonts.com/css/harry-p" rel="stylesheet">
+<style>
+html, body, [class*="css"] { font-family: 'Harry P', sans-serif; }
+h1, h2, h3 { font-family: 'Harry P', sans-serif; letter-spacing: 2px; }
+@keyframes glow {
+  0% { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffa500; }
+  50% { text-shadow: 0 0 20px #fff, 0 0 30px #ffd700; }
+  100% { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffa500; }
+}
+h1 { animation: glow 2s ease-in-out infinite alternate; text-align:center; color:gold; }
+</style>
+""", unsafe_allow_html=True)
 
-    with open(file_path, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
+# ---------- House Colors ----------
+house_colors = {
+    "Gryffindor": "#FFD700",
+    "Hufflepuff": "#000000",
+    "Ravenclaw": "#C0C0FF",
+    "Slytherin": "#C8E6C9"
+}
 
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url("data:image/jpeg;base64,{encoded}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+# ---------- Quiz & Puzzle Data ----------
+quizzes = {
+    "Gryffindor": [
+        {"q": "Who founded Gryffindor?", "options": ["Godric", "Helga", "Rowena", "Salazar"]},
+        {"q": "What is the Gryffindor emblem?", "options": ["Lion", "Badger", "Eagle", "Snake"]},
+        {"q": "Gryffindor common room is in?", "options": ["Tower", "Basement", "Library", "Dungeon"]},
+        {"q": "Gryffindor ghost is?", "options": ["Nearly Headless Nick", "Fat Friar", "Grey Lady", "Bloody Baron"]},
+        {"q": "Gryffindor colors?", "options": ["Red and Gold", "Yellow and Black", "Blue and Silver", "Green and Silver"]},
+        {"q": "What is Gryffindor's sword made of?", "options": ["Silver", "Gold", "Bronze", "Iron"]},
+        {"q": "Famous Gryffindor student?", "options": ["Harry Potter", "Draco Malfoy", "Luna Lovegood", "Cedric Diggory"]},
+        {"q": "House known for bravery?", "options": ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]},
+        {"q": "Gryffindor founder valued?", "options": ["Courage", "Loyalty", "Wisdom", "Ambition"]}
+    ],
+    "Hufflepuff": [
+        {"q": "Who founded Hufflepuff?", "options": ["Godric", "Helga", "Rowena", "Salazar"]},
+        {"q": "Hufflepuff emblem?", "options": ["Lion", "Badger", "Eagle", "Snake"]},
+        {"q": "Hufflepuff ghost?", "options": ["Nearly Headless Nick", "Fat Friar", "Grey Lady", "Bloody Baron"]},
+        {"q": "Hufflepuff values?", "options": ["Courage", "Loyalty", "Wisdom", "Ambition"]},
+        {"q": "Hufflepuff colors?", "options": ["Red and Gold", "Yellow and Black", "Blue and Silver", "Green and Silver"]},
+        {"q": "Famous Hufflepuff?", "options": ["Harry Potter", "Cedric Diggory", "Luna Lovegood", "Draco Malfoy"]},
+        {"q": "Hufflepuff common room location?", "options": ["Tower", "Near kitchens", "Library", "Dungeon"]},
+        {"q": "House known for hard work?", "options": ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]},
+        {"q": "Hufflepuff founder valued?", "options": ["Courage", "Fairness", "Wisdom", "Ambition"]}
+    ],
+    "Ravenclaw": [
+        {"q": "Who founded Ravenclaw?", "options": ["Godric", "Helga", "Rowena", "Salazar"]},
+        {"q": "Ravenclaw emblem?", "options": ["Lion", "Badger", "Eagle", "Snake"]},
+        {"q": "Ravenclaw ghost?", "options": ["Nearly Headless Nick", "Fat Friar", "Grey Lady", "Bloody Baron"]},
+        {"q": "Ravenclaw values?", "options": ["Courage", "Loyalty", "Wisdom", "Ambition"]},
+        {"q": "Ravenclaw colors?", "options": ["Red and Gold", "Yellow and Black", "Blue and Silver", "Green and Silver"]},
+        {"q": "Famous Ravenclaw?", "options": ["Harry Potter", "Cedric Diggory", "Luna Lovegood", "Draco Malfoy"]},
+        {"q": "Ravenclaw common room?", "options": ["Tower", "Near kitchens", "Library", "Dungeon"]},
+        {"q": "House known for intelligence?", "options": ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]},
+        {"q": "Ravenclaw founder valued?", "options": ["Courage", "Fairness", "Learning", "Ambition"]}
+    ],
+    "Slytherin": [
+        {"q": "Who founded Slytherin?", "options": ["Godric", "Helga", "Rowena", "Salazar"]},
+        {"q": "Slytherin emblem?", "options": ["Lion", "Badger", "Eagle", "Snake"]},
+        {"q": "Slytherin ghost?", "options": ["Nearly Headless Nick", "Fat Friar", "Grey Lady", "Bloody Baron"]},
+        {"q": "Slytherin values?", "options": ["Courage", "Loyalty", "Wisdom", "Ambition"]},
+        {"q": "Slytherin colors?", "options": ["Red and Gold", "Yellow and Black", "Blue and Silver", "Green and Silver"]},
+        {"q": "Famous Slytherin?", "options": ["Harry Potter", "Cedric Diggory", "Luna Lovegood", "Draco Malfoy"]},
+        {"q": "Slytherin common room?", "options": ["Tower", "Near kitchens", "Library", "Dungeon"]},
+        {"q": "House known for cunning?", "options": ["Gryffindor", "Hufflepuff", "Ravenclaw", "Slytherin"]},
+        {"q": "Slytherin founder valued?", "options": ["Courage", "Fairness", "Learning", "Resourcefulness"]}
+    ]
+}
 
-# ---- Home Page ----
+# ---------- Home Page ----------
 def home():
-    st.title("⚡ Welcome to WizardVerse AI ⚡")
-    st.subheader("Choose your Hogwarts House to begin your magical journey 🧙‍♂️")
+    set_background("assets/𝐇𝐨𝐠𝐰𝐚𝐫𝐭𝐬.jpg")
+    # Home page button style
+    st.markdown("""
+    <style>
+    div.stButton > button {
+        border-radius: 12px; border:2px solid transparent; color:white !important;
+        font-weight:bold; padding:0.6em 1.2em; transition: all 0.3s ease-in-out;
+        background-color: rgba(0,0,0,0.6);
+    }
+    div.stButton > button:hover { transform:scale(1.1); box-shadow:0 0 20px rgba(255,255,255,0.7); }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<h1>⚡ Welcome to WizardVerse AI ⚡</h1>", unsafe_allow_html=True)
     col1, col2, col3, col4 = st.columns(4)
+    if col1.button(" Gryffindor"): st.session_state["page"] = "Gryffindor"
+    if col2.button(" Hufflepuff"): st.session_state["page"] = "Hufflepuff"
+    if col3.button(" Ravenclaw"): st.session_state["page"] = "Ravenclaw"
+    if col4.button("Slytherin"): st.session_state["page"] = "Slytherin"
 
-    with col1:
-        if st.button(" Gryffindor"):
-            st.session_state["page"] = "Gryffindor"
+# ---------- House Page ----------
+def house_page(house_name, bg_image):
+    set_background(f"assets/{bg_image}")
 
-    with col2:
-        if st.button(" Hufflepuff"):
-            st.session_state["page"] = "Hufflepuff"
+    # House-specific button style
+    color = house_colors.get(house_name, "white")
+    st.markdown(f"""
+    <style>
+    div.stButton > button {{
+        border-radius:12px; border:2px solid {color}; font-weight:bold;
+        padding:0.6em 1.2em; background-color: rgba(0,0,0,0.6); color:white !important;
+        box-shadow:0 0 10px {color};
+        transition: all 0.3s ease-in-out;
+    }}
+    div.stButton > button:hover {{
+        transform: scale(1.1); box-shadow: 0 0 25px {color}; color: {color} !important;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
 
-    with col3:
-        if st.button(" Ravenclaw"):
-            st.session_state["page"] = "Ravenclaw"
+    st.markdown(f"<h1>{house_name} House</h1>", unsafe_allow_html=True)
+    tabs = st.tabs(["Quizzes", "Puzzles"])
 
-    with col4:
-        if st.button(" Slytherin"):
-            st.session_state["page"] = "Slytherin"
+    with tabs[0]:
+        for i, q in enumerate(quizzes[house_name]):
+            st.markdown(f"<p style='color:{color}; font-weight:bold;'>{i+1}. {q['q']}</p>", unsafe_allow_html=True)
+            st.radio("", q["options"], key=f"{house_name}_quiz{i}")
 
-# ---- House Pages ----
-def gryffindor_page():
-    set_background("assets/gryffindor_bg.jpg")
-    st.title("Gryffindor House")
-    st.write("Bravery, daring, nerve, and chivalry define a Gryffindor!")
-    st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
-    st.write("🚧 Coming soon... magical features await!")
+    with tabs[1]:
+        for i, q in enumerate(quizzes[house_name]):
+            st.markdown(f"<p style='color:{color}; font-weight:bold;'>{i+1}. {q['q']}</p>", unsafe_allow_html=True)
+            st.text_input("", key=f"{house_name}_puzzle{i}")
 
-def hufflepuff_page():
-    set_background("assets/hufflepuff_bg.jpg")
-    st.title("Hufflepuff House")
-    st.write("Loyalty, patience, and hard work make you shine!")
-    st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
-    st.write("🚧 Coming soon... magical features await!")
-
-def ravenclaw_page():
-    set_background("assets/ravenclaw_bg.jpg")
-    st.title("Ravenclaw House")
-    st.write("Wit, wisdom, and learning light your way.")
-    st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
-    st.write("🚧 Coming soon... magical features await!")
-
-def slytherin_page():
-    set_background("assets/serpent_bg.jpg")
-    st.title("Slytherin House")
-    st.write("Ambition, cunning, and resourcefulness guide you.")
-    st.subheader("✨ Quizzes | 🧩 Puzzles | 🪄 Spells")
-    st.write("🚧 Coming soon... magical features await!")
-
-# ---- Navigation Logic ----
+# ---------- Navigation ----------
 if "page" not in st.session_state:
     st.session_state["page"] = "Home"
 
 if st.session_state["page"] == "Home":
     home()
 elif st.session_state["page"] == "Gryffindor":
-    gryffindor_page()
+    house_page("Gryffindor", "gryffindor_bg.jpg")
 elif st.session_state["page"] == "Hufflepuff":
-    hufflepuff_page()
+    house_page("Hufflepuff", "hufflepuff_bg.jpg")
 elif st.session_state["page"] == "Ravenclaw":
-    ravenclaw_page()
+    house_page("Ravenclaw", "ravenclaw_bg.jpg")
 elif st.session_state["page"] == "Slytherin":
-    slytherin_page()
+    house_page("Slytherin", "serpent_bg.jpg")
 
-# ---- Back button ----
+
+# ---------- Back Button ----------
 if st.session_state["page"] != "Home":
-    if st.button("⬅️ Back to Houses"):
+    if st.button("Back to Houses"):
         st.session_state["page"] = "Home"
+
 
 
