@@ -1,0 +1,17 @@
+
+
+# Web framework
+streamlit
+
+# Data processing
+pandas
+numpy
+
+# Interactive plotting
+plotly
+
+pathlib, base64 are built-in
+
+matplotlib
+
+# Optional for caching, file paths (standard lib, no install needed)
