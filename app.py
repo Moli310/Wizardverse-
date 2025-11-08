@@ -18,8 +18,8 @@ def find_asset(filename, folder="assets"):
     return None
 
 # ---------- Helper: Set Background ----------
-def set_background(image_path):
-    p = Path(image_path)
+def set_background(assets/Hogwarts.jpg):
+    p = Path(assets/Hogwarts.jpg)
     if not p.exists():
         found = find_asset(p.name, p.parent)
         if found:
