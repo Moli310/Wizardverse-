@@ -17,20 +17,30 @@ def find_asset(filename, folder="assets"):
             return str(f)
     return None
 
-# ---------- Helper: Set Background ----------
-def set_background("assets/Hogwarts.jpg"):
-    p = Path("assets/Hogwarts.jpg")
+# ---------------------- PAGE CONFIG ----------------------
+st.set_page_config(
+    page_title="WizardVerse AI — Hogwarts Edition",
+    layout="wide",
+    page_icon="🪄",
+)
+
+# ---------- Helper: Set Magical Background ----------
+def set_background(image_path):
+    p = Path(image_path)
     if not p.exists():
-        found = find_asset(p.name, p.parent)
-        if found:
-            p = Path(found)
-        else:
-            st.warning(f"⚠️ Background image not found: {image_path}")
-            return
+        st.warning(f"⚠️ Background image not found: {image_path}")
+        return
+
     with open(p, "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
+
     st.markdown(f"""
     <style>
+    @keyframes fadeIn {{
+        0% {{ opacity: 0; transform: scale(1.05); }}
+        100% {{ opacity: 1; transform: scale(1); }}
+    }}
+
     .stApp {{
         background:
             linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
@@ -39,9 +49,25 @@ def set_background("assets/Hogwarts.jpg"):
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
+        animation: fadeIn 3s ease-in-out;
+        transition: background 1s ease-in-out;
+    }}
+
+    /* Optional Fog Overlay */
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("https://i.ibb.co/8mhCkzw/fog-overlay.gif");
+        background-size: cover;
+        opacity: 0.15;
+        pointer-events: none;
+        z-index: 0;
     }}
     </style>
     """, unsafe_allow_html=True)
+
+set_background("assets/Hogwarts.jpg")
 
 # ---------- Page Config ----------
 st.set_page_config(page_title="WizardVerse AI", layout="wide")
