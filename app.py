@@ -53,17 +53,6 @@ def set_background(image_path):
         transition: background 1s ease-in-out;
     }}
 
-    /* Optional Fog Overlay */
-    .stApp::before {{
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: url("https://i.ibb.co/8mhCkzw/fog-overlay.gif");
-        background-size: cover;
-        opacity: 0.15;
-        pointer-events: none;
-        z-index: 0;
-    }}
     </style>
     """, unsafe_allow_html=True)
 
