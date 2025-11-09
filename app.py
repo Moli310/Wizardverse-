@@ -28,7 +28,7 @@ st.set_page_config(
 def set_background(image_path):
     p = Path(image_path)
     if not p.exists():
-        st.warning(f"⚠️ Background image not found: {image_path}")
+       
         return
 
     with open(p, "rb") as f:
