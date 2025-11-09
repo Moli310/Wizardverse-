@@ -3,7 +3,7 @@ from pathlib import Path
 import base64
 import unicodedata
 
-# ---------- Helper: Find Asset --------
+# -------- Helper: Find Asset --------
 def find_asset(filename, folder="assets"):
     folder_path = Path(folder)
     if not folder_path.exists():
